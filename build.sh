@@ -2,8 +2,8 @@
 
 REPO_URL=https://github.com/DHDAXCW/lede-rockchip
 REPO_BRANCH=stable
-CONFIG_FILE=configs/lean/full.config
-CUSTOM_CONF=configs/lean/i2cy.config
+CONFIG_FILE=configs/lede/full.config
+CUSTOM_CONF=configs/lede/i2cy.config
 DIY_SH=scripts/lede.sh
 export KMODS_IN_FIRMWARE=true
 export UPLOAD_RELEASE=true
