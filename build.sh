@@ -103,8 +103,8 @@ else
 fi
 cp files/etc/opkg/distfeeds.conf.server files/etc/opkg/distfeeds.conf.mirror
 sed -i "s/http:\/\/192.168.123.100:2345\/snapshots/https:\/\/openwrt.cc\/snapshots\/$(date +"%Y-%m-%d")\/lean/g" files/etc/opkg/distfeeds.conf.mirror
-make package/install -j$(nproc) || make package/install -j1 V=s
-make target/install -j$(nproc) || make target/install -j1 V=s
+make package/install -j$(nproc) || make package/install -j1 V=sc
+make target/install -j$(nproc) || make target/install -j1 V=sc
 pushd bin/targets/rockchip/armv8
 rm -rf *ext4* *.manifest packages *.json *.buildinfo
 mv openwrt-rockchip-armv8-embedfire_doornet1-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_doornet1-squashfs-sysupgrade.img.gz
