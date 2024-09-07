@@ -65,7 +65,6 @@ find dl -size -1024c -exec ls -l {} \;
 find dl -size -1024c -exec rm -f {} \;
 
 echo "[build.sh]: compile packages..."
-cd $GITHUB_WORKSPACE
 cd $OPENWRTROOT
 echo -e "$(nproc) thread compile"
 make tools/compile -j$(nproc) || make tools/compile -j$(nproc)
@@ -75,10 +74,11 @@ make diffconfig
 make package/compile -j$(nproc) IGNORE_ERRORS=1 || make package/compile -j$(nproc) IGNORE_ERRORS=1
 make package/index
 cd $OPENWRTROOT/bin/packages/*
-export PLATFORM=$(basename `pwd`)
+PLATFORM=$(basename `pwd`)
+cd $OPENWRTROOT/bin/targets/*
+TARGET=$(basename `pwd`)
 cd *
-export SUBTARGET=$(basename `pwd`)
-export FIRMWARE=$PWD
+SUBTARGET=$(basename `pwd`)
 
 echo "[build.sh]: generating firmware..."
 cd $GITHUB_WORKSPACE
@@ -91,6 +91,8 @@ mkdir -p files/etc/uci-defaults/
 cp ../scripts/init-settings.sh files/etc/uci-defaults/99-init-settings
 mkdir -p files/etc/opkg
 cp ../configs/opkg/distfeeds-packages-server.conf files/etc/opkg/distfeeds.conf.server
+mkdir -p files/etc/opkg/keys
+cp ../configs/opkg/1035ac73cc4e59e3 files/etc/opkg/keys/1035ac73cc4e59e3
 if "$KMODS_IN_FIRMWARE" = 'true'
 then
     mkdir -p files/www/snapshots
@@ -103,14 +105,31 @@ cp files/etc/opkg/distfeeds.conf.server files/etc/opkg/distfeeds.conf.mirror
 sed -i "s/http:\/\/192.168.123.100:2345\/snapshots/https:\/\/openwrt.cc\/snapshots\/$(date +"%Y-%m-%d")\/lean/g" files/etc/opkg/distfeeds.conf.mirror
 make package/install -j$(nproc) || make package/install -j1 V=s
 make target/install -j$(nproc) || make target/install -j1 V=s
-pushd bin/targets/x86/64
-#rm -rf openwrt-x86-64-generic-kernel.bin
-#rm -rf openwrt-x86-64-generic-rootfs.tar.gz
-#rm -rf openwrt-x86-64-generic-squashfs-rootfs.img.gz
-#rm -rf openwrt-x86-64-generic-squashfs-combined-efi.vmdk
-#rm -rf openwrt-x86-64-generic.manifest
-mv openwrt-x86-64-generic-squashfs-combined-efi.img.gz $(date +"%Y.%m.%d")-docker-openwrt-x86-64-squashfs-efi.img.gz
+pushd bin/targets/rockchip/armv8
+rm -rf *ext4* *.manifest packages *.json *.buildinfo
+mv openwrt-rockchip-armv8-embedfire_doornet1-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_doornet1-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_doornet2-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_doornet2-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_lubancat-1n-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_lubancat-1n-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_lubancat-1-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_lubancat-1-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_lubancat-2n-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_lubancat-2n-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_lubancat-2-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_lubancat-2-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_lubancat-4-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_lubancat-4-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-embedfire_lubancat-5-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-embedfire_lubancat-5-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopc-t6-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopc-t6-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r2c-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r2c-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r2s-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r2s-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r4se-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r4se-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r4s-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r4s-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r5c-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r5c-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r5s-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r5s-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r6c-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r6c-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-friendlyarm_nanopi-r6s-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-friendlyarm_nanopi-r6s-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-hinlink_h88k-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-hinlink_h88k-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-hinlink_opc-h66k-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-hinlink_opc-h66k-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-hinlink_opc-h68k-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-hinlink_opc-h68k-squashfs-sysupgrade.img.gz
+mv openwrt-rockchip-armv8-hinlink_opc-h69k-squashfs-sysupgrade.img.gz $(date +"%Y.%m.%d")-docker-openwrt-hinlink_opc-h69k-squashfs-sysupgrade.img.gz
 popd
 make checksum
+mv bin/targets/rockchip/armv8/sha256sums bin/targets/rockchip/armv8/docker-sha256sums
 
 echo "[build.sh] build complete"
